@@ -82,7 +82,7 @@ Defmech.RotationWithQuaternion = (function()
 			overdraw: 0.5
 		});
 
-		plane = new THREE.Mesh(planeGeometry,planeMaterial);
+		plane = new THREE.Mesh(planeGeometry, planeMaterial);
 		scene.add(plane);
 
 		renderer = new THREE.CanvasRenderer();
@@ -148,6 +148,10 @@ Defmech.RotationWithQuaternion = (function()
 	function projectOnTrackball(pageX, pageY)
 	{
 		var mouseOnBall = new THREE.Vector3();
+
+		// calc perc of drag from centre
+
+		console.log(pageX - window.innerWidth * 0.5, (pageX - window.innerWidth * 0.5) / (window.innerWidth * 0.5));
 		mouseOnBall.set(
 			(pageX - window.innerWidth * 0.5) / (window.innerWidth * 0.5), (window.innerHeight * 0.5 - pageY) / (window.innerHeight * 0.5),
 			0.0
@@ -156,9 +160,7 @@ Defmech.RotationWithQuaternion = (function()
 		var length = mouseOnBall.length();
 		if (length > 1.0)
 		{
-
 			mouseOnBall.normalize();
-
 		}
 		else
 		{

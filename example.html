@@ -65,35 +65,35 @@ function init() {
 
     // Cube
 
-    var geometry = new THREE.BoxGeometry( 200, 200, 200 );
+    var boxGeometry = new THREE.BoxGeometry( 200, 200, 200 );
 
-    for ( var i = 0; i < geometry.faces.length; i += 2 ) {
+    for ( var i = 0; i < boxGeometry.faces.length; i += 2 ) {
 
         var color = {
-                h: (1 / (geometry.faces.length)) * i,
+                h: (1 / (boxGeometry.faces.length)) * i,
                 s: 0.5,
                 l: 0.5
             };
 
-            geometry.faces[i].color.setHSL(color.h, color.s, color.l);
-            geometry.faces[i + 1].color.setHSL(color.h, color.s, color.l);
+            boxGeometry.faces[i].color.setHSL(color.h, color.s, color.l);
+            boxGeometry.faces[i + 1].color.setHSL(color.h, color.s, color.l);
 
     }
 
     var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.FaceColors, overdraw: 0.5 } );
 
-    cube = new THREE.Mesh( geometry, material );
+    cube = new THREE.Mesh( boxGeometry, material );
     cube.position.y = 200;
     scene.add( cube );
 
     // Plane
 
-    var geometry = new THREE.PlaneGeometry( 200, 200 );
-    geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
+    var planeGeometry = new THREE.PlaneGeometry( 200, 200 );
+    planeGeometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 
     var material = new THREE.MeshBasicMaterial( { color: 0xe0e0e0, overdraw: 0.5 } );
 
-    plane = new THREE.Mesh( geometry, material );
+    plane = new THREE.Mesh( planeGeometry, material );
     scene.add( plane );
 
     renderer = new THREE.CanvasRenderer();

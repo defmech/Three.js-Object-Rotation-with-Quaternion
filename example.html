@@ -65,13 +65,18 @@ function init() {
 
     // Cube
 
-    var geometry = new THREE.CubeGeometry( 200, 200, 200 );
+    var geometry = new THREE.BoxGeometry( 200, 200, 200 );
 
     for ( var i = 0; i < geometry.faces.length; i += 2 ) {
 
-        var hex = Math.random() * 0xffffff;
-        geometry.faces[ i ].color.setHex( hex );
-        geometry.faces[ i + 1 ].color.setHex( hex );
+        var color = {
+                h: (1 / (geometry.faces.length)) * i,
+                s: 0.5,
+                l: 0.5
+            };
+
+            geometry.faces[i].color.setHSL(color.h, color.s, color.l);
+            geometry.faces[i + 1].color.setHSL(color.h, color.s, color.l);
 
     }
 
@@ -97,13 +102,7 @@ function init() {
 
     container.appendChild( renderer.domElement );
 
-
-
     document.addEventListener( 'mousedown', onDocumentMouseDown, false );
-    document.addEventListener( 'touchstart', onDocumentTouchStart, false );
-    document.addEventListener( 'touchmove', onDocumentTouchMove, false );
-
-    //
 
     window.addEventListener( 'resize', onWindowResize, false );
 
@@ -129,7 +128,6 @@ function onDocumentMouseDown( event ) {
 
     document.addEventListener( 'mousemove', onDocumentMouseMove, false );
     document.addEventListener( 'mouseup', onDocumentMouseUp, false );
-    document.addEventListener( 'mouseout', onDocumentMouseOut, false );
     mouseDown = true;
     rotateStartP = projectOnTrackball(event.clientX, event.clientY);
 }
@@ -145,6 +143,16 @@ function onDocumentMouseMove( event ) {
 
 
 }
+
+function onDocumentMouseUp( event ) {
+
+    document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
+    document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
+    mouseDown = false;
+    rotateStartP = rotateEndP;
+
+}
+
 function getMouseOnScreen( pageX, pageY) {
 
     return new THREE.Vector2.set(pageX / window.innerWidth ,pageY / window.innerHeight);
@@ -187,42 +195,6 @@ function rotateMatrix(rotateStart, rotateEnd)
         quaternion.setFromAxisAngle( axis, angle );
     }
     return  quaternion;
-}
-
-function onDocumentMouseUp( event ) {
-
-    document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
-    document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
-    document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
-    mouseDown = false;
-    rotateStartP = rotateEndP;
-
-}
-
-function onDocumentMouseOut( event ) {
-
-    document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
-    document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
-    document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
-
-}
-
-function onDocumentTouchStart( event ) {
-
-    if ( event.touches.length === 1 ) {
-
-        event.preventDefault();
-    }
-
-}
-
-function onDocumentTouchMove( event ) {
-
-    if ( event.touches.length === 1 ) {
-
-        event.preventDefault();
-    }
-
 }
 
 //

@@ -24,6 +24,11 @@ Defmech.RotationWithQuaternion = (function()
 	var windowHalfX = window.innerWidth / 2;
 	var windowHalfY = window.innerHeight / 2;
 
+	var startPoint = {
+		x: 0,
+		y: 0
+	};
+
 	var setup = function()
 	{
 		container = document.createElement('div');
@@ -117,6 +122,12 @@ Defmech.RotationWithQuaternion = (function()
 		document.addEventListener('mousemove', onDocumentMouseMove, false);
 		document.addEventListener('mouseup', onDocumentMouseUp, false);
 		mouseDown = true;
+
+		startPoint = {
+			x: event.clientX,
+			y: event.clientY
+		};
+
 		rotateStartP = projectOnTrackball(event.clientX, event.clientY);
 	}
 
@@ -143,21 +154,21 @@ Defmech.RotationWithQuaternion = (function()
 	{
 		return new THREE.Vector2.set(pageX / window.innerWidth, pageY / window.innerHeight);
 	}
-	// The screen coordinate[(0,0)on the left-top] convert to the
-	//trackball coordinate [(0,0) on the center of the page]
+
 	function projectOnTrackball(pageX, pageY)
 	{
+		var deltaX = pageX - startPoint.x;
+		var deltaY = pageY - startPoint.y;
+
 		var mouseOnBall = new THREE.Vector3();
 
-		// calc perc of drag from centre
-
-		console.log(pageX - window.innerWidth * 0.5, (pageX - window.innerWidth * 0.5) / (window.innerWidth * 0.5));
 		mouseOnBall.set(
-			(pageX - window.innerWidth * 0.5) / (window.innerWidth * 0.5), (window.innerHeight * 0.5 - pageY) / (window.innerHeight * 0.5),
+			deltaX / windowHalfX, deltaY / windowHalfY,
 			0.0
 		);
 
 		var length = mouseOnBall.length();
+
 		if (length > 1.0)
 		{
 			mouseOnBall.normalize();
@@ -166,6 +177,7 @@ Defmech.RotationWithQuaternion = (function()
 		{
 			mouseOnBall.z = Math.sqrt(1.0 - length * length);
 		}
+		
 		return mouseOnBall;
 	}
 

@@ -29,6 +29,11 @@ Defmech.RotationWithQuaternion = (function()
 		y: 0
 	};
 
+	var endPoint = {
+		x: 0,
+		y: 0
+	};
+
 	var setup = function()
 	{
 		container = document.createElement('div');
@@ -128,7 +133,7 @@ Defmech.RotationWithQuaternion = (function()
 			y: event.clientY
 		};
 
-		rotateStartP = projectOnTrackball(event.clientX, event.clientY);
+		rotateStartP = rotateEndP = projectOnTrackball(event.clientX, event.clientY);
 	}
 
 	function onDocumentMouseMove(event)
@@ -191,7 +196,8 @@ Defmech.RotationWithQuaternion = (function()
 		if (angle)
 		{
 			axis.crossVectors(rotateStart, rotateEnd).normalize();
-			angle *= 0.1; //Here we could define rotate speed
+			// Adjust rotate speed
+			angle *= 0.1; 
 			quaternion.setFromAxisAngle(axis, angle);
 		}
 		return quaternion;
@@ -205,16 +211,13 @@ Defmech.RotationWithQuaternion = (function()
 
 	function render()
 	{
-
 		var rotateQuaternion = rotateMatrix(rotateStartP, rotateEndP);
 		quater = cube.quaternion;
 		quater.multiplyQuaternions(rotateQuaternion, quater);
 		quater.normalize();
 		cube.setRotationFromQuaternion(quater);
 
-
 		renderer.render(scene, camera);
-
 	}
 
 	// PUBLIC INTERFACE

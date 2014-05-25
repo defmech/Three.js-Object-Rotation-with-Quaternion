@@ -163,7 +163,7 @@ Defmech.RotationWithQuaternion = (function()
 		var mouseOnBall = new THREE.Vector3();
 
 		mouseOnBall.set(
-			deltaX / windowHalfX, deltaY / windowHalfY,
+			deltaX / windowHalfX, -deltaY / windowHalfY,
 			0.0
 		);
 
@@ -177,7 +177,7 @@ Defmech.RotationWithQuaternion = (function()
 		{
 			mouseOnBall.z = Math.sqrt(1.0 - length * length);
 		}
-		
+
 		return mouseOnBall;
 	}
 

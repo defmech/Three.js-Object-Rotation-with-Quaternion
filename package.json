@@ -1,0 +1,12 @@
+{
+  "name": "stereo_3d",
+  "preferGlobal": true,
+  "version": "0.0.1",
+  "author": "Dave Lochhead <dave.lochhead@dogdigital.com>",
+  "description": "Baillie Giford - Global Discovery",
+  "dependencies": {},
+  "devDependencies": {
+    "gulp": "~3.6.2",
+    "gulp-livereload": "~1.3.1"
+  }
+}

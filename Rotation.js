@@ -174,17 +174,18 @@ Defmech.RotationWithQuaternion = (function()
 	{
 		var curPoint = centerPoint(event.clientX, event.clientY);
 
-		// pointDeltaMultiplier used to amplify the distance dragged for speed
-		var pointDeltaMultiplier = 50;
+		var pointDeltaMultiplierX = 40;
+		var pointDeltaMultiplierY = pointDeltaMultiplierX / camera.aspect;
 
 		var pointDelta = {
-			x: (curPoint.x - startPoint.x) * pointDeltaMultiplier,
-			y: (curPoint.y - startPoint.y) * pointDeltaMultiplier
+			x: (curPoint.x - startPoint.x) * pointDeltaMultiplierX,
+			y: (curPoint.y - startPoint.y) * pointDeltaMultiplierY
 		};
 
 		rotateEndPoint = projectOnTrackball(pointDelta.x, pointDelta.y);
-		
+
 		var rotateQuaternion = rotateMatrix(rotateStartPoint, rotateEndPoint);
+
 		var curQuaternion = cube.quaternion;
 		curQuaternion.multiplyQuaternions(rotateQuaternion, curQuaternion);
 		curQuaternion.normalize();

@@ -145,6 +145,14 @@ Defmech.RotationWithQuaternion = (function()
 		}
 
 		rotateEndP = projectOnTrackball(event.clientX, event.clientY);
+
+		var rotateQuaternion = rotateMatrix(rotateStartP, rotateEndP);
+		quater = cube.quaternion;
+		quater.multiplyQuaternions(rotateQuaternion, quater);
+		quater.normalize();
+		cube.setRotationFromQuaternion(quater);
+
+		rotateEndP = rotateStartP;
 	}
 
 	function onDocumentMouseUp(event)
@@ -168,7 +176,7 @@ Defmech.RotationWithQuaternion = (function()
 		var mouseOnBall = new THREE.Vector3();
 
 		mouseOnBall.set(
-			deltaX / windowHalfX, -deltaY / windowHalfY,
+			clamp(deltaX / windowHalfX, -1, 1), clamp(-deltaY / windowHalfY, -1, 1),
 			0.0
 		);
 
@@ -197,10 +205,15 @@ Defmech.RotationWithQuaternion = (function()
 		{
 			axis.crossVectors(rotateStart, rotateEnd).normalize();
 			// Adjust rotate speed
-			angle *= 0.1; 
+			angle *= 0.1;
 			quaternion.setFromAxisAngle(axis, angle);
 		}
 		return quaternion;
+	}
+
+	function clamp(value, min, max)
+	{
+		return Math.min(Math.max(value, min), max);
 	}
 
 	function animate()
@@ -211,11 +224,13 @@ Defmech.RotationWithQuaternion = (function()
 
 	function render()
 	{
-		var rotateQuaternion = rotateMatrix(rotateStartP, rotateEndP);
-		quater = cube.quaternion;
-		quater.multiplyQuaternions(rotateQuaternion, quater);
-		quater.normalize();
-		cube.setRotationFromQuaternion(quater);
+		// var rotateQuaternion = rotateMatrix(rotateStartP, rotateEndP);
+		// quater = cube.quaternion;
+		// quater.multiplyQuaternions(rotateQuaternion, quater);
+		// quater.normalize();
+		// cube.setRotationFromQuaternion(quater);
+
+		// rotateStartP = rotateEndP;
 
 		renderer.render(scene, camera);
 	}

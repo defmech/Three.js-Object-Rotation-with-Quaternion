@@ -13,14 +13,14 @@ Defmech.RotationWithQuaternion = (function()
 	var cube, plane;
 
 	var mouseDown = false;
-	var rotateStartP = new THREE.Vector3(0, 0, 1);
-	var rotateEndP = new THREE.Vector3(0, 0, 1);
+	var rotateStartPoint = new THREE.Vector3(0, 0, 1);
+	var rotateEndPoint = new THREE.Vector3(0, 0, 1);
 
 	var lastPosX;
 	var lastPosY;
 	var targetRotationY = 0;
 	var targetRotationX = 0;
-	var quater;
+	var curQuaternion;
 	var windowHalfX = window.innerWidth / 2;
 	var windowHalfY = window.innerHeight / 2;
 
@@ -133,26 +133,20 @@ Defmech.RotationWithQuaternion = (function()
 			y: event.clientY
 		};
 
-		rotateStartP = rotateEndP = projectOnTrackball(event.clientX, event.clientY);
+		rotateStartPoint = rotateEndPoint = projectOnTrackball(event.clientX, event.clientY);
 	}
 
 	function onDocumentMouseMove(event)
 	{
+		rotateEndPoint = projectOnTrackball(event.clientX, event.clientY);
 
-		if (!mouseDown)
-		{
-			return;
-		}
+		var rotateQuaternion = rotateMatrix(rotateStartPoint, rotateEndPoint);
+		curQuaternion = cube.quaternion;
+		curQuaternion.multiplyQuaternions(rotateQuaternion, curQuaternion);
+		curQuaternion.normalize();
+		cube.setRotationFromQuaternion(curQuaternion);
 
-		rotateEndP = projectOnTrackball(event.clientX, event.clientY);
-
-		var rotateQuaternion = rotateMatrix(rotateStartP, rotateEndP);
-		quater = cube.quaternion;
-		quater.multiplyQuaternions(rotateQuaternion, quater);
-		quater.normalize();
-		cube.setRotationFromQuaternion(quater);
-
-		rotateEndP = rotateStartP;
+		rotateEndPoint = rotateStartPoint;
 	}
 
 	function onDocumentMouseUp(event)
@@ -160,18 +154,18 @@ Defmech.RotationWithQuaternion = (function()
 		document.removeEventListener('mousemove', onDocumentMouseMove, false);
 		document.removeEventListener('mouseup', onDocumentMouseUp, false);
 		mouseDown = false;
-		rotateStartP = rotateEndP;
+		rotateStartPoint = rotateEndPoint;
 	}
 
-	function getMouseOnScreen(pageX, pageY)
+	function projectOnTrackball(touchX, touchY)
 	{
-		return new THREE.Vector2.set(pageX / window.innerWidth, pageY / window.innerHeight);
-	}
+		var deltaX = touchX - startPoint.x;
+		var deltaY = touchY - startPoint.y;
 
-	function projectOnTrackball(pageX, pageY)
-	{
-		var deltaX = pageX - startPoint.x;
-		var deltaY = pageY - startPoint.y;
+		var multiplier = 30;
+
+		deltaX *= multiplier;
+		deltaY *= (multiplier / camera.aspect);
 
 		var mouseOnBall = new THREE.Vector3();
 
@@ -190,6 +184,9 @@ Defmech.RotationWithQuaternion = (function()
 		{
 			mouseOnBall.z = Math.sqrt(1.0 - length * length);
 		}
+
+		startPoint.x = touchX;
+		startPoint.y = touchY;
 
 		return mouseOnBall;
 	}
@@ -224,13 +221,13 @@ Defmech.RotationWithQuaternion = (function()
 
 	function render()
 	{
-		// var rotateQuaternion = rotateMatrix(rotateStartP, rotateEndP);
-		// quater = cube.quaternion;
-		// quater.multiplyQuaternions(rotateQuaternion, quater);
-		// quater.normalize();
-		// cube.setRotationFromQuaternion(quater);
+		// var rotateQuaternion = rotateMatrix(rotateStartPoint, rotateEndPoint);
+		// curQuaternion = cube.quaternion;
+		// curQuaternion.multiplyQuaternions(rotateQuaternion, curQuaternion);
+		// curQuaternion.normalize();
+		// cube.setRotationFromQuaternion(curQuaternion);
 
-		// rotateStartP = rotateEndP;
+		// rotateStartPoint = rotateEndPoint;
 
 		renderer.render(scene, camera);
 	}

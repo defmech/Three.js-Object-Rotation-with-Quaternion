@@ -1,3 +1,11 @@
+window.log = function()
+{
+	if (this.console)
+	{
+		console.log(Array.prototype.slice.call(arguments));
+	}
+};
+
 // Namespace
 var Defmech = Defmech ||
 {};
@@ -159,6 +167,8 @@ Defmech.RotationWithQuaternion = (function()
 
 	function projectOnTrackball(touchX, touchY)
 	{
+		log('touchX', touchX, 'touchY', touchY);
+
 		var deltaX = touchX - startPoint.x;
 		var deltaY = touchY - startPoint.y;
 
@@ -167,6 +177,8 @@ Defmech.RotationWithQuaternion = (function()
 		deltaX *= multiplier;
 		deltaY *= (multiplier / camera.aspect);
 
+		log('deltaX', deltaX, 'deltaY', deltaY);
+		
 		var mouseOnBall = new THREE.Vector3();
 
 		mouseOnBall.set(

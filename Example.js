@@ -24,20 +24,12 @@ Defmech.RotationWithQuaternion = (function()
 	var rotateStartPoint = new THREE.Vector3(0, 0, 1);
 	var rotateEndPoint = new THREE.Vector3(0, 0, 1);
 
-	var lastPosX;
-	var lastPosY;
-	var targetRotationY = 0;
-	var targetRotationX = 0;
 	var curQuaternion;
 	var windowHalfX = window.innerWidth / 2;
 	var windowHalfY = window.innerHeight / 2;
+	var rotationSpeed = 2;
 
 	var startPoint = {
-		x: 0,
-		y: 0
-	};
-
-	var endPoint = {
 		x: 0,
 		y: 0
 	};
@@ -118,7 +110,6 @@ Defmech.RotationWithQuaternion = (function()
 
 	function onWindowResize()
 	{
-
 		windowHalfX = window.innerWidth / 2;
 		windowHalfY = window.innerHeight / 2;
 
@@ -134,6 +125,7 @@ Defmech.RotationWithQuaternion = (function()
 
 		document.addEventListener('mousemove', onDocumentMouseMove, false);
 		document.addEventListener('mouseup', onDocumentMouseUp, false);
+
 		mouseDown = true;
 
 		startPoint = {
@@ -141,12 +133,15 @@ Defmech.RotationWithQuaternion = (function()
 			y: event.clientY
 		};
 
-		rotateStartPoint = rotateEndPoint = projectOnTrackball(event.clientX, event.clientY);
+		rotateStartPoint = rotateEndPoint = projectOnTrackball(0, 0);
 	}
 
 	function onDocumentMouseMove(event)
 	{
-		rotateEndPoint = projectOnTrackball(event.clientX, event.clientY);
+		var deltaX = event.x - startPoint.x;
+		var deltaY = event.y - startPoint.y;
+
+		rotateEndPoint = projectOnTrackball(deltaX, deltaY);
 
 		var rotateQuaternion = rotateMatrix(rotateStartPoint, rotateEndPoint);
 		curQuaternion = cube.quaternion;
@@ -155,6 +150,8 @@ Defmech.RotationWithQuaternion = (function()
 		cube.setRotationFromQuaternion(curQuaternion);
 
 		rotateEndPoint = rotateStartPoint;
+		startPoint.x = event.x;
+		startPoint.y = event.y;
 	}
 
 	function onDocumentMouseUp(event)
@@ -167,22 +164,10 @@ Defmech.RotationWithQuaternion = (function()
 
 	function projectOnTrackball(touchX, touchY)
 	{
-		log('touchX', touchX, 'touchY', touchY);
-
-		var deltaX = touchX - startPoint.x;
-		var deltaY = touchY - startPoint.y;
-
-		var multiplier = 30;
-
-		deltaX *= multiplier;
-		deltaY *= (multiplier / camera.aspect);
-
-		log('deltaX', deltaX, 'deltaY', deltaY);
-		
 		var mouseOnBall = new THREE.Vector3();
 
 		mouseOnBall.set(
-			clamp(deltaX / windowHalfX, -1, 1), clamp(-deltaY / windowHalfY, -1, 1),
+			clamp(touchX / windowHalfX, -1, 1), clamp(-touchY / windowHalfY, -1, 1),
 			0.0
 		);
 
@@ -197,9 +182,6 @@ Defmech.RotationWithQuaternion = (function()
 			mouseOnBall.z = Math.sqrt(1.0 - length * length);
 		}
 
-		startPoint.x = touchX;
-		startPoint.y = touchY;
-
 		return mouseOnBall;
 	}
 
@@ -213,8 +195,7 @@ Defmech.RotationWithQuaternion = (function()
 		if (angle)
 		{
 			axis.crossVectors(rotateStart, rotateEnd).normalize();
-			// Adjust rotate speed
-			angle *= 0.1;
+			angle *= rotationSpeed;
 			quaternion.setFromAxisAngle(axis, angle);
 		}
 		return quaternion;
@@ -233,14 +214,6 @@ Defmech.RotationWithQuaternion = (function()
 
 	function render()
 	{
-		// var rotateQuaternion = rotateMatrix(rotateStartPoint, rotateEndPoint);
-		// curQuaternion = cube.quaternion;
-		// curQuaternion.multiplyQuaternions(rotateQuaternion, curQuaternion);
-		// curQuaternion.normalize();
-		// cube.setRotationFromQuaternion(curQuaternion);
-
-		// rotateStartPoint = rotateEndPoint;
-
 		renderer.render(scene, camera);
 	}
 

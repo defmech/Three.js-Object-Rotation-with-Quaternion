@@ -28,11 +28,16 @@ Defmech.RotationWithQuaternion = (function()
 	var windowHalfX = window.innerWidth / 2;
 	var windowHalfY = window.innerHeight / 2;
 	var rotationSpeed = 2;
+	var lastMoveTimestamp,
+		moveReleaseTimeDelta = 50;
 
 	var startPoint = {
 		x: 0,
 		y: 0
 	};
+
+	var deltaX = 0,
+		deltaY = 0;
 
 	var setup = function()
 	{
@@ -138,28 +143,29 @@ Defmech.RotationWithQuaternion = (function()
 
 	function onDocumentMouseMove(event)
 	{
-		var deltaX = event.x - startPoint.x;
-		var deltaY = event.y - startPoint.y;
+		deltaX = event.x - startPoint.x;
+		deltaY = event.y - startPoint.y;
 
-		rotateEndPoint = projectOnTrackball(deltaX, deltaY);
+		handleRotation();
 
-		var rotateQuaternion = rotateMatrix(rotateStartPoint, rotateEndPoint);
-		curQuaternion = cube.quaternion;
-		curQuaternion.multiplyQuaternions(rotateQuaternion, curQuaternion);
-		curQuaternion.normalize();
-		cube.setRotationFromQuaternion(curQuaternion);
-
-		rotateEndPoint = rotateStartPoint;
 		startPoint.x = event.x;
 		startPoint.y = event.y;
+
+		lastMoveTimestamp = new Date();
 	}
 
 	function onDocumentMouseUp(event)
 	{
+		if (new Date().getTime() - lastMoveTimestamp.getTime() > moveReleaseTimeDelta)
+		{
+			deltaX = event.x - startPoint.x;
+			deltaY = event.y - startPoint.y;
+		}
+
+		mouseDown = false;
+
 		document.removeEventListener('mousemove', onDocumentMouseMove, false);
 		document.removeEventListener('mouseup', onDocumentMouseUp, false);
-		mouseDown = false;
-		rotateStartPoint = rotateEndPoint;
 	}
 
 	function projectOnTrackball(touchX, touchY)
@@ -214,8 +220,47 @@ Defmech.RotationWithQuaternion = (function()
 
 	function render()
 	{
+		if (!mouseDown)
+		{
+			var drag = 0.95;
+			var minDelta = 0.05;
+
+			if (deltaX < -minDelta || deltaX > minDelta)
+			{
+				deltaX *= drag;
+			}
+			else
+			{
+				deltaX = 0;
+			}
+
+			if (deltaY < -minDelta || deltaY > minDelta)
+			{
+				deltaY *= drag;
+			}
+			else
+			{
+				deltaY = 0;
+			}
+
+			handleRotation();
+		}
+
 		renderer.render(scene, camera);
 	}
+
+	var handleRotation = function()
+	{
+		rotateEndPoint = projectOnTrackball(deltaX, deltaY);
+
+		var rotateQuaternion = rotateMatrix(rotateStartPoint, rotateEndPoint);
+		curQuaternion = cube.quaternion;
+		curQuaternion.multiplyQuaternions(rotateQuaternion, curQuaternion);
+		curQuaternion.normalize();
+		cube.setRotationFromQuaternion(curQuaternion);
+
+		rotateEndPoint = rotateStartPoint;
+	};
 
 	// PUBLIC INTERFACE
 	return {

@@ -7,6 +7,8 @@ I was looking for ways to rotate an object, not the camera, in a 3d scene using 
 
 **The rotation now works as I expect. Phew.**
 
+**Now with momentum** Try spinning the cube fast.
+
 Putting this code out there in case it helps anyone or could be improved.
 
 View an example here: http://projects.defmech.com/ThreeJSObjectRotationWithQuaternion/

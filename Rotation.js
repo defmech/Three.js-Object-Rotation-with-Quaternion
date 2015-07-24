@@ -18,7 +18,7 @@ Defmech.RotationWithQuaternion = (function()
 
 	var camera, scene, renderer;
 
-	var cube, plane;
+	var cube, floor;
 
 	var mouseDown = false;
 	var rotateStartPoint = new THREE.Vector3(0, 0, 1);
@@ -76,7 +76,7 @@ Defmech.RotationWithQuaternion = (function()
 
 		}
 
-		var cubeMaterial = new THREE.MeshBasicMaterial(
+		var cubeMaterial = new THREE.MeshLambertMaterial(
 		{
 			vertexColors: THREE.FaceColors,
 			overdraw: 0.5
@@ -84,24 +84,64 @@ Defmech.RotationWithQuaternion = (function()
 
 		cube = new THREE.Mesh(boxGeometry, cubeMaterial);
 		cube.position.y = 200;
+		cube.castShadow = true;
 		scene.add(cube);
 
-		// Plane
+		// LIGHTS
 
-		var planeGeometry = new THREE.PlaneGeometry(200, 200);
-		planeGeometry.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI / 2));
+		var hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6);
+		hemiLight.color.setHSL(1, 1, 1);
+		hemiLight.position.set(0, 500, 0);
+		scene.add(hemiLight);
 
-		var planeMaterial = new THREE.MeshBasicMaterial(
+		var dirLight = new THREE.DirectionalLight(0xffffff, 1);
+		dirLight.color.setHSL(0.2, 0.2, 0.2);
+		dirLight.position.set(0, 800, 0);
+		dirLight.castShadow = true;
+
+		dirLight.shadowMapWidth = 2048;
+		dirLight.shadowMapHeight = 2048;
+
+		var d = 400;
+
+		dirLight.shadowCameraLeft = -d;
+		dirLight.shadowCameraRight = d;
+		dirLight.shadowCameraTop = d;
+		dirLight.shadowCameraBottom = -d;
+
+		dirLight.shadowCameraFar = 3500;
+		dirLight.shadowBias = -0.0001;
+		dirLight.shadowDarkness = 0.20;
+		// dirLight.shadowCameraVisible = true;
+
+		scene.add(dirLight);
+		// GROUND
+
+		var groundGeo = new THREE.PlaneGeometry(10000, 10000);
+		var groundMat = new THREE.MeshPhongMaterial(
 		{
-			color: 0xe0e0e0,
-			overdraw: 0.5
+			ambient: 0xffffff,
+			color: 0xffffff,
+			specular: 0x000000
 		});
+		groundMat.color.setHSL(1, 1, 1);
 
-		plane = new THREE.Mesh(planeGeometry, planeMaterial);
-		scene.add(plane);
+		var ground = new THREE.Mesh(groundGeo, groundMat);
+		ground.rotation.x = -Math.PI / 2;
+		ground.position.y = -33;
+		ground.receiveShadow = true;
 
-		renderer = new THREE.CanvasRenderer();
+		scene.add(ground);
+
+		// renderer
+		renderer = new THREE.WebGLRenderer(
+		{
+			antialias: true
+		});
+		// renderer = new THREE.CanvasRenderer();
 		renderer.setClearColor(0xf0f0f0);
+		renderer.shadowMapEnabled = true;
+		renderer.shadowMapCullFace = THREE.CullFaceBack;
 		renderer.setSize(window.innerWidth, window.innerHeight);
 
 		container.appendChild(renderer.domElement);
